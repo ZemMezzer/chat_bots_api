@@ -1,6 +1,6 @@
 ﻿using System;
 using ChatBotsApi.Core.Messages.Data;
-using Telegram.Bot.Types;
+using ChatBotsApi.Core.Messages.Interfaces;
 
 namespace ChatBotsApi.Core.Messages
 {
@@ -8,9 +8,9 @@ namespace ChatBotsApi.Core.Messages
     {
         public static class Convert
         {
-            public static MessageData ToMessageData(Message message, ChatData chat)
+            public static MessageData ToMessageData(object message, ChatData chat, IMessageProvider provider)
             {
-                long userId = message.From.Id;
+                long userId = provider.GetSenderId(message);
                 UserData user;
                 
                 if (!chat.ContainsUser(userId))
@@ -23,7 +23,7 @@ namespace ChatBotsApi.Core.Messages
                     }
 
                     ColorData color = new ColorData(colors[0], colors[1], colors[2]);
-                    user = new UserData(userId, color, message.From.Username);
+                    user = new UserData(userId, color, provider.GetSenderNickname(message));
                     chat.AddUser(user);
                 }
                 else
@@ -31,25 +31,13 @@ namespace ChatBotsApi.Core.Messages
                     user = chat.GetUser(userId);
                 }
 
-                return new MessageData(ToString(message), user, chat);
-            }
-
-
-            public static string ToString(Message message)
-            {
-                if (message.Text != null)
-                    return message.Text;
-
-                if (message.LeftChatMember != null)
-                    return "Left";
-
-                return "[File]";
+                return new MessageData(provider.ToString(message), user, chat);
             }
         }
 
-        public static MessageData AddMessageInChat(Message message, ChatData chat)
+        public static MessageData AddMessageInChat(object message, ChatData chat, IMessageProvider provider)
         {
-            MessageData messageData = Convert.ToMessageData(message, chat);
+            MessageData messageData = Convert.ToMessageData(message, chat, provider);
             chat.AddMessage(messageData);
             return messageData;
         }

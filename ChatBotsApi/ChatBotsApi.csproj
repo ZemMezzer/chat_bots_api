@@ -63,6 +63,7 @@
     </ItemGroup>
     <ItemGroup>
         <Compile Include="Bots\TelegramBot\Interfaces\ITelegramMessageReceiver.cs" />
+        <Compile Include="Bots\TelegramBot\Messages\TelegramMessageProvider.cs" />
         <Compile Include="Bots\TelegramBot\TelegramBot.cs" />
         <Compile Include="Common\Extensions\TypeExtension.cs" />
         <Compile Include="Common\Handlers\SaveDataHandler.cs" />
@@ -72,6 +73,7 @@
         <Compile Include="Core\Messages\Data\ColorData.cs" />
         <Compile Include="Core\Messages\Data\MessageData.cs" />
         <Compile Include="Core\Messages\Data\UserData.cs" />
+        <Compile Include="Core\Messages\Interfaces\IMessageProvider.cs" />
         <Compile Include="Core\Messages\MessageHandler.cs" />
         <Compile Include="Properties\AssemblyInfo.cs" />
     </ItemGroup>

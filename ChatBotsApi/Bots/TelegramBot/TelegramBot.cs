@@ -3,10 +3,12 @@ using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
 using ChatBotsApi.Bots.TelegramBot.Interfaces;
+using ChatBotsApi.Bots.TelegramBot.Messages;
 using ChatBotsApi.Common.Extensions;
 using ChatBotsApi.Core;
 using ChatBotsApi.Core.Messages;
 using ChatBotsApi.Core.Messages.Data;
+using ChatBotsApi.Core.Messages.Interfaces;
 using Telegram.Bot;
 using Telegram.Bot.Types;
 
@@ -16,10 +18,12 @@ namespace ChatBotsApi.Bots.TelegramBot
     {
         private readonly TelegramBotClient _client;
         private readonly HashSet<ITelegramMessageReceiver> _messageReceivers = new();
-        
+        private readonly IMessageProvider _messageProvider;
 
         public TelegramBot(string name, string token) : base(name, token)
         {
+            _messageProvider = new TelegramMessageProvider();
+            
             _client = new TelegramBotClient(token);
             _client.StartReceiving(OnMessageReceivedHandler, OnError);
             
@@ -42,7 +46,7 @@ namespace ChatBotsApi.Bots.TelegramBot
                     Data.Chats.Add(messageChatName, chat);
                 }
 
-                var message = MessageHandler.AddMessageInChat(update.Message, Data.Chats[messageChatName]);
+                var message = MessageHandler.AddMessageInChat(update.Message, Data.Chats[messageChatName], _messageProvider);
                 MessageReceived(message);
             }
 
