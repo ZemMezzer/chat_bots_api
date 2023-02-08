@@ -6,7 +6,7 @@ using ChatBotsApi.Core.Data;
 
 namespace ChatBotsApi.Common.Handlers
 {
-    public static class SaveDataHandler
+    internal static class SaveDataHandler
     {
         private const string SavePath = "SaveData";
 
