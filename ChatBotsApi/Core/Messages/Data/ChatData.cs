@@ -14,6 +14,9 @@ namespace ChatBotsApi.Core.Messages.Data
         
         public IReadOnlyList<MessageData> Messages => _messages;
 
+        /// <summary>
+        /// Warning! Not thread safe
+        /// </summary>
         [NonSerialized] public Action<MessageData> OnMessageReceived; 
 
         public ChatData(long id, string name)

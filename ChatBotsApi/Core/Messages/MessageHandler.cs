@@ -8,17 +8,17 @@ namespace ChatBotsApi.Core.Messages
     {
         public static class Convert
         {
-            public static MessageData ToMessageData(object message, ChatData chat, IMessageProvider provider)
+            public static MessageData ToMessageData(object message, ChatData chatData, IMessageProvider provider)
             {
-                UserData user = provider.GetUserData(message, chat);
+                UserData user = provider.GetUserData(message, chatData);
 
-                if (!chat.ContainsUser(user.UserId))
+                if (!chatData.ContainsUser(user.UserId))
                 {
                     user.UserColor = GenerateColor();
-                    chat.AddUser(user);
+                    chatData.AddUser(user);
                 }
 
-                return provider.ToMessageData(message, chat);
+                return provider.ToMessageData(message, chatData);
             }
         }
 
@@ -35,16 +35,16 @@ namespace ChatBotsApi.Core.Messages
             return color;
         }
 
-        public static MessageData AddMessageInChat(object message, ChatData chat, IMessageProvider provider)
+        public static MessageData AddMessageInChat(object message, ChatData chatData, IMessageProvider provider)
         {
-            MessageData messageData = Convert.ToMessageData(message, chat, provider);
-            chat.AddMessage(messageData);
+            MessageData messageData = Convert.ToMessageData(message, chatData, provider);
+            chatData.AddMessage(messageData);
             return messageData;
         }
         
-        public static MessageData AddMessageInChat(MessageData message, ChatData chat)
+        public static MessageData AddMessageInChat(MessageData message, ChatData chatData)
         {
-            chat.AddMessage(message);
+            chatData.AddMessage(message);
             return message;
         }
     }

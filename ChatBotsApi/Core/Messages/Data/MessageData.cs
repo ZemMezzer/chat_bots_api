@@ -8,13 +8,13 @@ namespace ChatBotsApi.Core.Messages.Data
         public long Id { get; }
         public string Message { get; }
         public UserData Sender { get; }
-        public ChatData Chat { get; }
+        public ChatData ChatData { get; }
 
-        public MessageData(string message, long id, UserData sender, ChatData chat)
+        public MessageData(string message, long id, UserData sender, ChatData chatData)
         {
             Message = message;
             Sender = sender;
-            Chat = chat;
+            ChatData = chatData;
             Id = id;
         }
     }
