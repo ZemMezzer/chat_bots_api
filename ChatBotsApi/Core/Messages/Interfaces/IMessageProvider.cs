@@ -1,9 +1,10 @@
-﻿namespace ChatBotsApi.Core.Messages.Interfaces
+﻿using ChatBotsApi.Core.Messages.Data;
+
+namespace ChatBotsApi.Core.Messages.Interfaces
 {
     public interface IMessageProvider
     {
-        public string ToString(object source);
-        public long GetSenderId(object source);
-        public string GetSenderNickname(object source);
+        public MessageData ToMessageData(object source, ChatData data);
+        public UserData GetUserData(object source, ChatData data);
     }
 }

@@ -12,7 +12,10 @@ namespace ChatBotsApi.Core.Data
 
         public BotData(long botId, string name, ColorData userColor)
         {
-            BotUser = new UserData(botId, userColor, name);
+            BotUser = new UserData(botId, name)
+            {
+                UserColor = userColor
+            };
         }
     }
 }

@@ -6,13 +6,12 @@ namespace ChatBotsApi.Core.Messages.Data
     public class UserData
     {
         public long UserId { get; }
-        public ColorData UserColor { get; }
+        public ColorData UserColor { get; set; }
         public string UserName { get; }
 
-        public UserData(long id, ColorData color, string name)
+        public UserData(long id, string name)
         {
             UserId = id;
-            UserColor = color;
             UserName = name;
         }
     }

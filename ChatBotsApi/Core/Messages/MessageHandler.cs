@@ -10,29 +10,29 @@ namespace ChatBotsApi.Core.Messages
         {
             public static MessageData ToMessageData(object message, ChatData chat, IMessageProvider provider)
             {
-                long userId = provider.GetSenderId(message);
-                UserData user;
-                
-                if (!chat.ContainsUser(userId))
-                {
-                    int[] colors = new int[3];
-                    for (int i = 0; i < 3; i++)
-                    {
-                        Random random = new Random(i);
-                        colors[i] = random.Next(0, 255);
-                    }
+                UserData user = provider.GetUserData(message, chat);
 
-                    ColorData color = new ColorData(colors[0], colors[1], colors[2]);
-                    user = new UserData(userId, color, provider.GetSenderNickname(message));
+                if (!chat.ContainsUser(user.UserId))
+                {
+                    user.UserColor = GenerateColor();
                     chat.AddUser(user);
                 }
-                else
-                {
-                    user = chat.GetUser(userId);
-                }
 
-                return new MessageData(provider.ToString(message), user, chat);
+                return provider.ToMessageData(message, chat);
             }
+        }
+
+        private static ColorData GenerateColor()
+        {
+            int[] colors = new int[3];
+            for (int i = 0; i < 3; i++)
+            {
+                Random random = new Random(i);
+                colors[i] = random.Next(0, 255);
+            }
+
+            ColorData color = new ColorData(colors[0], colors[1], colors[2]);
+            return color;
         }
 
         public static MessageData AddMessageInChat(object message, ChatData chat, IMessageProvider provider)

@@ -23,12 +23,16 @@ namespace ChatBotsApi.Bots.TelegramBot
         public TelegramBot(string name, string token) : base(name, token)
         {
             _messageProvider = new TelegramMessageProvider();
-            
             _client = new TelegramBotClient(token);
             _client.StartReceiving(OnMessageReceivedHandler, OnError);
             
             InitializeBotData((long)_client.BotId);
+            InitializeReceivers();
+        }
 
+
+        private void InitializeReceivers()
+        {
             Type[] receiversTypes = typeof(ITelegramMessageReceiver).GetAllConcreteChildTypes();
 
             foreach (var messageReceiver in receiversTypes.ActivateAllTypes<ITelegramMessageReceiver>())
@@ -56,14 +60,17 @@ namespace ChatBotsApi.Bots.TelegramBot
         
         private Task OnError(ITelegramBotClient client, Exception exception, CancellationToken token) => throw exception;
 
-        protected override async Task SendMessageInternal(MessageData message, ChatData chat)
+        protected override async Task<MessageData> SendTextMessageInternal(string message, ChatData chat)
         {
+            var sentMessage = await _client.SendTextMessageAsync(chat.ChatId, message);
+            MessageData result = MessageHandler.Convert.ToMessageData(sentMessage, chat, _messageProvider);
+            
             if (Data.Chats.ContainsKey(chat.ChatName))
             {
-                MessageSend(message);
+                MessageSend(result);
             }
-            
-            await _client.SendTextMessageAsync(chat.ChatId, message.Message);
+
+            return result;
         }
     }
 }

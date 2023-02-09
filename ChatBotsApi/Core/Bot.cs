@@ -41,16 +41,17 @@ namespace ChatBotsApi.Core
             Data = SaveDataHandler.TryLoadData(Name, out BotData data) ? data : new BotData(clientBotId, Name, Color);
         }
 
-        public async Task SendMessage(MessageData message, ChatData chat)
+        public async Task<MessageData> SendTextMessage(string message, ChatData chat)
         {
-            MessageHandler.AddMessageInChat(message, chat);
-            await SendMessageInternal(message, chat);
+            MessageData result = await SendTextMessageInternal(message, chat);
+            MessageHandler.AddMessageInChat(result, chat);
+            return result;
         }
 
         protected void MessageReceived(MessageData message) => OnMessageReceived?.Invoke(message);
         protected void MessageSend(MessageData message) => OnMessageSend?.Invoke(message);
 
-        protected abstract Task SendMessageInternal(MessageData message, ChatData chat);
+        protected abstract Task<MessageData> SendTextMessageInternal(string message, ChatData chat);
 
         public void Save()
         {
