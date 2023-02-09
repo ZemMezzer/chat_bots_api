@@ -2,6 +2,7 @@
 using ChatBotsApi.Bots.DiscordBot.Interfaces;
 using ChatBotsApi.Bots.DiscordBot.Messages;
 using ChatBotsApi.Core;
+using ChatBotsApi.Core.Data;
 using ChatBotsApi.Core.Messages;
 using ChatBotsApi.Core.Messages.Data;
 using ChatBotsApi.Core.Messages.Interfaces;
@@ -15,7 +16,7 @@ namespace ChatBotsApi.Bots.DiscordBot
         private readonly DiscordClient _client;
         private IMessageProvider _messageProvider;
         
-        public DiscordBot(string name, string token) : base(name, token)
+        public DiscordBot(string token) : base(token)
         {
             DiscordConfiguration configuration = new DiscordConfiguration
             {
@@ -30,7 +31,7 @@ namespace ChatBotsApi.Bots.DiscordBot
         private async Task InitializeClient()
         {
             await _client.ConnectAsync();
-            InitializeBotData((long)_client.CurrentUser.Id);
+            InitializeBotData();
             _client.MessageCreated += OnMessageReceivedHandler;
             
             BindMessageReceivers<IDiscordMessageReceiver>();
@@ -41,14 +42,8 @@ namespace ChatBotsApi.Bots.DiscordBot
         {
             if (!string.IsNullOrEmpty(e.Message.Content) && e.Author != _client.CurrentUser)
             {
-                string messageChatName = e.Channel.Name;
-                if (!Data.Chats.ContainsKey(messageChatName))
-                {
-                    ChatData chatData = new ChatData((long)e.Channel.Id, messageChatName);
-                    Data.Chats.Add(messageChatName, chatData);
-                }
-
-                var message = MessageHandler.AddMessageInChat(e.Message, Data.Chats[messageChatName], _messageProvider);
+                MemoryController.UpdateMemoryByMessage(e.Message, Memory, _messageProvider);
+                var message = MessageHandler.AddMessageInChat(e.Message, Memory, _messageProvider);
                 MessageReceived(message);
             }
 
@@ -62,9 +57,10 @@ namespace ChatBotsApi.Bots.DiscordBot
             var channel = await _client.GetChannelAsync((ulong) chatData.ChatId);
             var sentMessage = await channel!.SendMessageAsync(message);
 
-            MessageData result = MessageHandler.Convert.ToMessageData(sentMessage, chatData, _messageProvider);
+            MemoryController.UpdateMemoryByMessage(sentMessage, Memory, _messageProvider);
+            MessageData result = MessageHandler.Convert.ToMessageData(sentMessage, Memory, _messageProvider);
             
-            if (Data.Chats.ContainsKey(chatData.ChatName))
+            if (Memory.GetChats().ContainsKey(chatData.ChatId))
             {
                 MessageSend(result);
             }

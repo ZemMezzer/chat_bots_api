@@ -15,28 +15,17 @@ namespace ChatBotsApi.Core
         private static Dictionary<Type, Bot> _bots = new();
 
         public string Token { get; }
-        public BotData Data { get; private set; }
-        
-        
-        protected readonly ColorData Color;
-        protected string Name { get; }
+        public MemoryData Memory { get; private set; }
 
         public event Action<MessageData> OnMessageReceived;
         public event Action<MessageData> OnMessageSend;
 
         private Dictionary<Type, HashSet<object>>_messageReceivers = new();
 
-        public Bot(string name, string token) : this(name, token, new ColorData(1,1,1,1))
-        {
-            
-        }
-
-        public Bot(string name, string token, ColorData color)
+        public Bot(string token)
         {
             Token += token;
-            Name = name;
             _bots.Add(GetType(), this);
-            Color = color;
         }
 
         protected void BindMessageReceivers<T>()
@@ -67,9 +56,9 @@ namespace ChatBotsApi.Core
             return buffer;
         }
 
-        protected void InitializeBotData(long clientBotId)
+        protected void InitializeBotData()
         {
-            Data = SaveDataHandler.TryLoadData(Name, out BotData data) ? data : new BotData(clientBotId, Name, Color);
+            Memory = SaveDataHandler.TryLoadData(GetType().Name, out MemoryData data) ? data : new MemoryData();
         }
 
         public async Task<MessageData> SendTextMessage(string message, ChatData chatData)
@@ -90,7 +79,7 @@ namespace ChatBotsApi.Core
 
         public void Save()
         {
-            SaveDataHandler.SaveData(Name, Data);
+            SaveDataHandler.SaveData(GetType().Name, Memory);
         }
 
         public static T GetBot<T>() where T : Bot

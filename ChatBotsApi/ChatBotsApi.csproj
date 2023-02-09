@@ -171,7 +171,8 @@
         <Compile Include="Common\Extensions\TypeExtension.cs" />
         <Compile Include="Common\Handlers\SaveDataHandler.cs" />
         <Compile Include="Core\Bot.cs" />
-        <Compile Include="Core\Data\BotData.cs" />
+        <Compile Include="Core\Data\MemoryController.cs" />
+        <Compile Include="Core\Data\MemoryData.cs" />
         <Compile Include="Core\Messages\Data\ChatData.cs" />
         <Compile Include="Core\Messages\Data\ColorData.cs" />
         <Compile Include="Core\Messages\Data\MessageData.cs" />

@@ -4,6 +4,7 @@ using System.Threading.Tasks;
 using ChatBotsApi.Bots.TelegramBot.Interfaces;
 using ChatBotsApi.Bots.TelegramBot.Messages;
 using ChatBotsApi.Core;
+using ChatBotsApi.Core.Data;
 using ChatBotsApi.Core.Messages;
 using ChatBotsApi.Core.Messages.Data;
 using ChatBotsApi.Core.Messages.Interfaces;
@@ -17,13 +18,13 @@ namespace ChatBotsApi.Bots.TelegramBot
         private readonly TelegramBotClient _client;
         private readonly IMessageProvider _messageProvider;
 
-        public TelegramBot(string name, string token) : base(name, token)
+        public TelegramBot(string token) : base(token)
         {
             _messageProvider = new TelegramMessageProvider();
             _client = new TelegramBotClient(token);
             _client.StartReceiving(OnMessageReceivedHandler, OnError);
             
-            InitializeBotData((long)_client.BotId);
+            InitializeBotData();
             BindMessageReceivers<ITelegramMessageReceiver>();
         }
 
@@ -31,14 +32,8 @@ namespace ChatBotsApi.Bots.TelegramBot
         {
             if (update.Message != null)
             {
-                string messageChatName = update.Message.Chat.Username ?? update.Message.Chat.Title;
-                if (!Data.Chats.ContainsKey(messageChatName))
-                {
-                    ChatData chatData = new ChatData(update.Message.Chat.Id, messageChatName);
-                    Data.Chats.Add(messageChatName, chatData);
-                }
-
-                var message = MessageHandler.AddMessageInChat(update.Message, Data.Chats[messageChatName], _messageProvider);
+                MemoryController.UpdateMemoryByMessage(update.Message, Memory, _messageProvider);
+                var message = MessageHandler.AddMessageInChat(update.Message, Memory, _messageProvider);
                 MessageReceived(message);
             }
 
@@ -51,9 +46,11 @@ namespace ChatBotsApi.Bots.TelegramBot
         protected override async Task<MessageData> SendTextMessageInternal(string message, ChatData chatData)
         {
             var sentMessage = await _client.SendTextMessageAsync(chatData.ChatId, message);
-            MessageData result = MessageHandler.Convert.ToMessageData(sentMessage, chatData, _messageProvider);
+            MemoryController.UpdateMemoryByMessage(sentMessage, Memory, _messageProvider);
             
-            if (Data.Chats.ContainsKey(chatData.ChatName))
+            MessageData result = MessageHandler.Convert.ToMessageData(sentMessage, Memory, _messageProvider);
+            
+            if (Memory.GetChats().ContainsKey(chatData.ChatId))
             {
                 MessageSend(result);
             }

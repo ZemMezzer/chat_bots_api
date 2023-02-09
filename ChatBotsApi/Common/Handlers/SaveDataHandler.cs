@@ -10,7 +10,7 @@ namespace ChatBotsApi.Common.Handlers
     {
         private const string SavePath = "SaveData";
 
-        public static void SaveData(string key, BotData data)
+        public static void SaveData(string key, MemoryData data)
         {
             if (!Directory.Exists(SavePath))
                 Directory.CreateDirectory(SavePath);
@@ -23,7 +23,7 @@ namespace ChatBotsApi.Common.Handlers
             formatter.Serialize(fileStream, data);
         }
 
-        public static bool TryLoadData(string key, out BotData data)
+        public static bool TryLoadData(string key, out MemoryData data)
         {
             data = null;
             string path = SavePath + "/" + key;
@@ -38,7 +38,7 @@ namespace ChatBotsApi.Common.Handlers
                 IFormatter formatter = new BinaryFormatter();
                 object result = formatter.Deserialize(fileStream);
 
-                if (result is not BotData dataInstance) 
+                if (result is not MemoryData dataInstance) 
                     return false;
                     
                 data = dataInstance;

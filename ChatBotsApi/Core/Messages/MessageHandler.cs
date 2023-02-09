@@ -1,4 +1,4 @@
-﻿using System;
+﻿using ChatBotsApi.Core.Data;
 using ChatBotsApi.Core.Messages.Data;
 using ChatBotsApi.Core.Messages.Interfaces;
 
@@ -8,37 +8,17 @@ namespace ChatBotsApi.Core.Messages
     {
         public static class Convert
         {
-            public static MessageData ToMessageData(object message, ChatData chatData, IMessageProvider provider)
+            public static MessageData ToMessageData(object message, MemoryData memory, IMessageProvider provider)
             {
-                UserData user = provider.GetUserData(message, chatData);
-
-                if (!chatData.ContainsUser(user.UserId))
-                {
-                    user.UserColor = GenerateColor();
-                    chatData.AddUser(user);
-                }
-
-                return provider.ToMessageData(message, chatData);
+                var messageData = provider.ToMessageData(message, memory);
+                return messageData;
             }
         }
 
-        private static ColorData GenerateColor()
+        public static MessageData AddMessageInChat(object message, MemoryData memory, IMessageProvider provider)
         {
-            int[] colors = new int[3];
-            for (int i = 0; i < 3; i++)
-            {
-                Random random = new Random(i);
-                colors[i] = random.Next(0, 255);
-            }
-
-            ColorData color = new ColorData(colors[0], colors[1], colors[2]);
-            return color;
-        }
-
-        public static MessageData AddMessageInChat(object message, ChatData chatData, IMessageProvider provider)
-        {
-            MessageData messageData = Convert.ToMessageData(message, chatData, provider);
-            chatData.AddMessage(messageData);
+            MessageData messageData = Convert.ToMessageData(message, memory, provider);
+            messageData.ChatData.AddMessage(messageData);
             return messageData;
         }
         
