@@ -9,13 +9,15 @@ namespace ChatBotsApi.Core.Messages.Data
         public string Message { get; }
         public UserData Sender { get; }
         public ChatData ChatData { get; }
+        public bool IsPrivateMessage { get; }
 
-        public MessageData(string message, long id, UserData sender, ChatData chatData)
+        public MessageData(string message, long id, UserData sender, ChatData chatData, bool isPrivateMessage)
         {
             Message = message;
             Sender = sender;
             ChatData = chatData;
             Id = id;
+            IsPrivateMessage = isPrivateMessage;
         }
     }
 }

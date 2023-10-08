@@ -14,5 +14,18 @@ namespace ChatBotsApi.Core.Messages.Data
             UserId = id;
             UserName = name;
         }
+
+        public override int GetHashCode()
+        {
+            return UserId.GetHashCode();
+        }
+
+        public override bool Equals(object obj)
+        {
+            if (obj is not UserData userData)
+                return false;
+
+            return userData.UserId == UserId && userData.UserName == UserName;
+        }
     }
 }

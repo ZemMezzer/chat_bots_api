@@ -3,40 +3,48 @@ using ChatBotsApi.Core.Data;
 using ChatBotsApi.Core.Messages.Data;
 using ChatBotsApi.Core.Messages.Interfaces;
 using Telegram.Bot.Types;
+using Telegram.Bot.Types.Enums;
 
 namespace ChatBotsApi.Bots.TelegramBot.Messages
 {
     internal class TelegramMessageProvider : IMessageProvider
     {
-        public MessageData ToMessageData(object source, MemoryData data)
+        private readonly MemoryData _memory;
+        
+        public TelegramMessageProvider(MemoryData memory)
+        {
+            _memory = memory;
+        }
+        
+        public MessageData ToMessageData(object source)
         {
             if (source is not Message message)
                 throw new InvalidCastException();
-
-            return new MessageData(ToString(message), message.MessageId, data.GetUser(message.From.Id), data.GetChats()[message.Chat.Id]);
+            
+            return new MessageData(ToString(message), message.MessageId, _memory.GetUser(message.From.Id), _memory.GetChats()[message.Chat.Id], message.Chat.Type == ChatType.Private);
         }
 
-        public ChatData GetChatData(object source, MemoryData data)
+        public ChatData GetChatData(object source)
         {
             if (source is not Message message)
                 throw new InvalidCastException();
             
             string messageChatName = message.Chat.Username ?? message.Chat.Title;
-            if (!data.GetChats().ContainsKey(message.Chat.Id))
+            if (!_memory.GetChats().ContainsKey(message.Chat.Id))
                 return new ChatData(message.Chat.Id, messageChatName);
 
-            return data.GetChats()[message.Chat.Id];
+            return _memory.GetChats()[message.Chat.Id];
         }
 
-        public UserData GetUserData(object source, MemoryData data)
+        public UserData GetUserData(object source)
         {
             if (source is not Message message)
                 throw new InvalidCastException();
 
             long userId = message.From.Id;
 
-            if (data.GetUsers().ContainsKey(userId))
-                return data.GetUser(userId);
+            if (_memory.GetUsers().ContainsKey(userId))
+                return _memory.GetUser(userId);
             
             return new UserData(message.From.Id, message.From.Username);
         }

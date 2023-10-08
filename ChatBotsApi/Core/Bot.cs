@@ -16,16 +16,21 @@ namespace ChatBotsApi.Core
 
         public string Token { get; }
         public MemoryData Memory { get; private set; }
+        public string Name { get; }
+        public string Id { get; }
 
         public event Action<MessageData> OnMessageReceived;
         public event Action<MessageData> OnMessageSend;
 
         private Dictionary<Type, HashSet<object>>_messageReceivers = new();
 
-        public Bot(string token)
+        public Bot(string token, string name, string id)
         {
             Token += token;
             _bots.Add(GetType(), this);
+            
+            Name = name;
+            Id = id;
         }
 
         protected void BindMessageReceivers<T>()
@@ -64,7 +69,7 @@ namespace ChatBotsApi.Core
         public async Task<MessageData> SendTextMessage(string message, ChatData chatData)
         {
             MessageData result = await SendTextMessageInternal(message, chatData);
-            MessageHandler.AddMessageInChat(result, chatData);
+            chatData.AddMessage(result);
             return result;
         }
 

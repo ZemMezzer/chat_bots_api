@@ -16,7 +16,7 @@ namespace ChatBotsApi.Bots.DiscordBot
         private readonly DiscordClient _client;
         private IMessageProvider _messageProvider;
         
-        public DiscordBot(string token) : base(token)
+        public DiscordBot(string token, string name, string id) : base(token, name, id)
         {
             DiscordConfiguration configuration = new DiscordConfiguration
             {
@@ -35,7 +35,7 @@ namespace ChatBotsApi.Bots.DiscordBot
             _client.MessageCreated += OnMessageReceivedHandler;
             
             BindMessageReceivers<IDiscordMessageReceiver>();
-            _messageProvider = new DiscordMessageProvider();
+            _messageProvider = new DiscordMessageProvider(Memory);
         }
 
         private async Task OnMessageReceivedHandler(DiscordClient sender, MessageCreateEventArgs e)
@@ -43,7 +43,7 @@ namespace ChatBotsApi.Bots.DiscordBot
             if (!string.IsNullOrEmpty(e.Message.Content) && e.Author != _client.CurrentUser)
             {
                 MemoryController.UpdateMemoryByMessage(e.Message, Memory, _messageProvider);
-                var message = MessageHandler.AddMessageInChat(e.Message, Memory, _messageProvider);
+                var message = MessageHandler.AddMessageInChat(e.Message, _messageProvider);
                 MessageReceived(message);
             }
 
@@ -58,7 +58,7 @@ namespace ChatBotsApi.Bots.DiscordBot
             var sentMessage = await channel!.SendMessageAsync(message);
 
             MemoryController.UpdateMemoryByMessage(sentMessage, Memory, _messageProvider);
-            MessageData result = MessageHandler.Convert.ToMessageData(sentMessage, Memory, _messageProvider);
+            MessageData result = MessageHandler.Convert.ToMessageData(sentMessage, _messageProvider);
             
             if (Memory.GetChats().ContainsKey(chatData.ChatId))
             {

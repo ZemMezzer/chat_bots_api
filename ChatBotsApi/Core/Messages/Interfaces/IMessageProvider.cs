@@ -1,12 +1,11 @@
-﻿using ChatBotsApi.Core.Data;
-using ChatBotsApi.Core.Messages.Data;
+﻿using ChatBotsApi.Core.Messages.Data;
 
 namespace ChatBotsApi.Core.Messages.Interfaces
 {
-    public interface IMessageProvider
+    internal interface IMessageProvider
     {
-        public MessageData ToMessageData(object source, MemoryData data);
-        public ChatData GetChatData(object source, MemoryData data);
-        public UserData GetUserData(object source, MemoryData data);
+        public MessageData ToMessageData(object source);
+        public ChatData GetChatData(object source);
+        public UserData GetUserData(object source);
     }
 }

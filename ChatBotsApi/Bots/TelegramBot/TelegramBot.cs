@@ -18,14 +18,15 @@ namespace ChatBotsApi.Bots.TelegramBot
         private readonly TelegramBotClient _client;
         private readonly IMessageProvider _messageProvider;
 
-        public TelegramBot(string token) : base(token)
+        public TelegramBot(string token, string name, string id) : base(token, name, id)
         {
-            _messageProvider = new TelegramMessageProvider();
             _client = new TelegramBotClient(token);
             _client.StartReceiving(OnMessageReceivedHandler, OnError);
             
             InitializeBotData();
             BindMessageReceivers<ITelegramMessageReceiver>();
+            
+            _messageProvider = new TelegramMessageProvider(Memory);
         }
 
         private async Task OnMessageReceivedHandler(ITelegramBotClient client, Update update, CancellationToken token)
@@ -33,7 +34,7 @@ namespace ChatBotsApi.Bots.TelegramBot
             if (update.Message != null)
             {
                 MemoryController.UpdateMemoryByMessage(update.Message, Memory, _messageProvider);
-                var message = MessageHandler.AddMessageInChat(update.Message, Memory, _messageProvider);
+                var message = MessageHandler.AddMessageInChat(update.Message, _messageProvider);
                 MessageReceived(message);
             }
 
@@ -48,7 +49,7 @@ namespace ChatBotsApi.Bots.TelegramBot
             var sentMessage = await _client.SendTextMessageAsync(chatData.ChatId, message);
             MemoryController.UpdateMemoryByMessage(sentMessage, Memory, _messageProvider);
             
-            MessageData result = MessageHandler.Convert.ToMessageData(sentMessage, Memory, _messageProvider);
+            MessageData result = MessageHandler.Convert.ToMessageData(sentMessage, _messageProvider);
             
             if (Memory.GetChats().ContainsKey(chatData.ChatId))
             {

@@ -4,12 +4,12 @@ using ChatBotsApi.Core.Messages.Interfaces;
 
 namespace ChatBotsApi.Core.Data
 {
-    public static class MemoryController
+    internal static class MemoryController
     {
         public static void UpdateMemoryByMessage(object message, MemoryData memory, IMessageProvider provider)
         {
-            UserData user = provider.GetUserData(message, memory);
-            ChatData chat = provider.GetChatData(message, memory);
+            UserData user = provider.GetUserData(message);
+            ChatData chat = provider.GetChatData(message);
 
             if (!memory.GetUsers().ContainsKey(user.UserId))
             {
