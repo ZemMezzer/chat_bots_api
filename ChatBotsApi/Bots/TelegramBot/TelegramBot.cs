@@ -35,9 +35,18 @@ namespace ChatBotsApi.Bots.TelegramBot
             {
                 MemoryController.UpdateMemoryByMessage(update.Message, Memory, _messageProvider);
                 var message = MessageHandler.AddMessageInChat(update.Message, _messageProvider);
-                MessageReceived(message);
-            }
 
+                if (update.Message.ReplyToMessage != null && update.Message.ReplyToMessage.From.Username == Id)
+                {
+                    var forwardedMessage = MessageHandler.Convert.ToMessageData(update.Message.ReplyToMessage, _messageProvider);
+                    BotMessageForwarded(message, forwardedMessage);
+                }
+                else
+                {
+                    MessageReceived(message);
+                }
+            }
+            
             foreach (var messageReceiver in GetBindReceivers<ITelegramMessageReceiver>())
                 await messageReceiver.OnMessageReceived(client, update, token);
         }

@@ -12,22 +12,25 @@ namespace ChatBotsApi.Core
     [Serializable]
     public abstract class Bot
     {
-        private static Dictionary<Type, Bot> _bots = new();
-
         public string Token { get; }
         public MemoryData Memory { get; private set; }
         public string Name { get; }
         public string Id { get; }
-
-        public event Action<MessageData> OnMessageReceived;
+        
+        
+        /// <summary>
+        /// Invokes when message of bot was forwarded
+        /// MessageData: CurrentMessage; MessageData: ForwardedMessage
+        /// </summary>
+        public event Action<MessageData, MessageData> OnBotMessageForwarded; 
         public event Action<MessageData> OnMessageSend;
+        public event Action<MessageData> OnMessageReceived;
 
         private Dictionary<Type, HashSet<object>>_messageReceivers = new();
 
         public Bot(string token, string name, string id)
         {
             Token += token;
-            _bots.Add(GetType(), this);
             
             Name = name;
             Id = id;
@@ -78,6 +81,11 @@ namespace ChatBotsApi.Core
             OnMessageReceived?.Invoke(message);
         }
 
+        protected void BotMessageForwarded(MessageData currentMessage, MessageData forwardedMessage)
+        {
+            OnBotMessageForwarded?.Invoke(currentMessage, forwardedMessage);
+        }
+
         protected void MessageSend(MessageData message) => OnMessageSend?.Invoke(message);
 
         protected abstract Task<MessageData> SendTextMessageInternal(string message, ChatData chatData);
@@ -85,14 +93,6 @@ namespace ChatBotsApi.Core
         public void Save()
         {
             SaveDataHandler.SaveData(GetType().Name, Memory);
-        }
-
-        public static T GetBot<T>() where T : Bot
-        {
-            if (_bots.ContainsKey(typeof(T)))
-                return (T)_bots[typeof(T)];
-
-            return null;
         }
     }
 }

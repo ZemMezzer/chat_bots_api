@@ -11,7 +11,18 @@ namespace ChatBotsApi.Common.Extensions
             List<Type> types = new List<Type>();
 
             foreach (var assembly in AppDomain.CurrentDomain.GetAssemblies())
-                types.AddRange(assembly.GetTypes().Where(t => (type.IsInterface ? t.GetInterfaces().Contains(type) : t.IsSubclassOf(type)) && t.IsClass && !t.IsAbstract));
+            {
+                try
+                {
+                    types.AddRange(assembly.GetTypes().Where(t =>
+                        (type.IsInterface ? t.GetInterfaces().Contains(type) : t.IsSubclassOf(type)) && t.IsClass &&
+                        !t.IsAbstract));
+                }
+                catch (Exception e)
+                {
+                    Console.WriteLine($"Can't find selected type {type} in {assembly.FullName}");
+                }
+            }
             
 
             return types.ToArray();

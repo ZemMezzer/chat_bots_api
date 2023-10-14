@@ -7,12 +7,12 @@ namespace ChatBotsApi.Core.Messages.Data
     public class ChatData
     {
         private readonly Dictionary<long, UserData> _users = new();
-        private readonly List<MessageData> _messages = new();
+        private readonly Dictionary<long, MessageData> _messages = new();
         
         public long ChatId { get; }
         public string ChatName { get; }
         
-        public IReadOnlyList<MessageData> Messages => _messages;
+        public IReadOnlyDictionary<long, MessageData> Messages => _messages;
 
         /// <summary>
         /// Warning! Not thread safe
@@ -42,7 +42,9 @@ namespace ChatBotsApi.Core.Messages.Data
 
         public void AddMessage(MessageData message)
         {
-            _messages.Add(message);
+            if(!_messages.ContainsKey(message.Id)) 
+                _messages.Add(message.Id, message);
+            
             OnMessageReceived?.Invoke(message);
         }
     }

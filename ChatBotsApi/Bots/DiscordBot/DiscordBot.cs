@@ -44,7 +44,16 @@ namespace ChatBotsApi.Bots.DiscordBot
             {
                 MemoryController.UpdateMemoryByMessage(e.Message, Memory, _messageProvider);
                 var message = MessageHandler.AddMessageInChat(e.Message, _messageProvider);
-                MessageReceived(message);
+
+                if (e.Message.MessageType == MessageType.Reply && e.Message.ReferencedMessage.Author.Username == Name)
+                {
+                    var forwardedMessage = MessageHandler.Convert.ToMessageData(e.Message.ReferencedMessage, _messageProvider);
+                    BotMessageForwarded(message, forwardedMessage);
+                }
+                else
+                {
+                    MessageReceived(message);
+                }
             }
 
             var receivers = GetBindReceivers<IDiscordMessageReceiver>();

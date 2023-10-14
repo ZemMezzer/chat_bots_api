@@ -21,7 +21,7 @@ namespace ChatBotsApi.Bots.TelegramBot.Messages
             if (source is not Message message)
                 throw new InvalidCastException();
             
-            return new MessageData(ToString(message), message.MessageId, _memory.GetUser(message.From.Id), _memory.GetChats()[message.Chat.Id], message.Chat.Type == ChatType.Private);
+            return new MessageData(ToString(message), message.MessageId, _memory.GetUser(message.From.Id, message.From.Username), _memory.GetChats()[message.Chat.Id], message.Chat.Type == ChatType.Private);
         }
 
         public ChatData GetChatData(object source)
@@ -42,11 +42,7 @@ namespace ChatBotsApi.Bots.TelegramBot.Messages
                 throw new InvalidCastException();
 
             long userId = message.From.Id;
-
-            if (_memory.GetUsers().ContainsKey(userId))
-                return _memory.GetUser(userId);
-            
-            return new UserData(message.From.Id, message.From.Username);
+            return _memory.GetUser(userId, message.From.Username);
         }
 
         private string ToString(Message message)

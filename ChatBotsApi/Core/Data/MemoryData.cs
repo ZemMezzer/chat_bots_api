@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using ChatBotsApi.Core.Messages.Data;
+using Telegram.Bot.Types;
 
 namespace ChatBotsApi.Core.Data
 {
@@ -25,12 +26,14 @@ namespace ChatBotsApi.Core.Data
                 _users.Add(data.UserId, data);
         }
 
-        public UserData GetUser(long id)
+        public UserData GetUser(long id, string userName)
         {
-            if (_users.ContainsKey(id))
-                return _users[id];
+            if (_users.TryGetValue(id, out var result))
+                return result;
 
-            throw new KeyNotFoundException();
+            UserData user = new UserData(id, userName);
+            _users.Add(id, user);
+            return user;
         }
     }
 }

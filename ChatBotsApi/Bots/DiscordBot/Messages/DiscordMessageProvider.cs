@@ -20,7 +20,7 @@ namespace ChatBotsApi.Bots.DiscordBot.Messages
             if (source is not DiscordMessage message)
                 throw new InvalidCastException();
 
-            return new MessageData(message.Content, (long)message.Id, _memory.GetUser((long)message.Author.Id), _memory.GetChats()[(long)message.ChannelId], message.Channel.IsPrivate);
+            return new MessageData(message.Content, (long)message.Id, _memory.GetUser((long)message.Author.Id, message.Author.Username), _memory.GetChats()[(long)message.ChannelId], message.Channel.IsPrivate);
         }
 
         public ChatData GetChatData(object source)
@@ -41,11 +41,7 @@ namespace ChatBotsApi.Bots.DiscordBot.Messages
                 throw new InvalidCastException();
             
             long userId = (long)message.Author.Id;
-
-            if (_memory.GetUsers().ContainsKey(userId))
-                return _memory.GetUser(userId);
-            
-            return new UserData((long)message.Author.Id, message.Author.Username);
+            return _memory.GetUser(userId, message.Author.Username);
         }
     }
 }

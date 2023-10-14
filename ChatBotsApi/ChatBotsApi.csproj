@@ -174,7 +174,6 @@
         <Compile Include="Core\Data\MemoryController.cs" />
         <Compile Include="Core\Data\MemoryData.cs" />
         <Compile Include="Core\Messages\Data\ChatData.cs" />
-        <Compile Include="Core\Messages\Data\ColorData.cs" />
         <Compile Include="Core\Messages\Data\MessageData.cs" />
         <Compile Include="Core\Messages\Data\UserData.cs" />
         <Compile Include="Core\Messages\Interfaces\IMessageProvider.cs" />
